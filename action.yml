@@ -1,0 +1,63 @@
+name: Beryl tests
+description: Upload an Android or iOS build to Beryl, run the project's Beryl tests, and fail the job when the run fails.
+author: Beryl
+branding:
+  icon: check-circle
+  color: green
+
+inputs:
+  token:
+    description: The project's CI token (beryl_ci_...), from Automation > CI. Pass it from a secret.
+    required: true
+  workspace:
+    description: Workspace id.
+    required: true
+  project:
+    description: Project id.
+    required: true
+  build:
+    description: >-
+      Build to upload before the run: an .apk or .aab, an iOS simulator .app folder, or its
+      .zip or EAS .tar.gz. Omit it to run against the newest build already uploaded.
+    required: false
+    default: ""
+  env:
+    description: Environment id to upload the build to and run against.
+    required: false
+    default: ""
+  group:
+    description: Run only these groups, one per line or comma-separated. Omit to run every active test.
+    required: false
+    default: ""
+  timeout:
+    description: Minutes to wait for the run before failing the job. The run keeps going in Beryl.
+    required: false
+    default: ""
+  cli-version:
+    description: Version of @beryl-so/cli to install.
+    required: false
+    default: latest
+
+outputs:
+  run-id:
+    description: The Beryl run id.
+    value: ${{ steps.beryl.outputs.run-id }}
+  run-url:
+    description: Link to the run in Beryl.
+    value: ${{ steps.beryl.outputs.run-url }}
+
+runs:
+  using: composite
+  steps:
+    - id: beryl
+      shell: bash
+      run: '"$GITHUB_ACTION_PATH/run.sh"'
+      env:
+        BERYL_TOKEN: ${{ inputs.token }}
+        INPUT_WORKSPACE: ${{ inputs.workspace }}
+        INPUT_PROJECT: ${{ inputs.project }}
+        INPUT_BUILD: ${{ inputs.build }}
+        INPUT_ENV: ${{ inputs.env }}
+        INPUT_GROUP: ${{ inputs.group }}
+        INPUT_TIMEOUT: ${{ inputs.timeout }}
+        INPUT_CLI_VERSION: ${{ inputs.cli-version }}
