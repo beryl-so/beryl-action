@@ -26,7 +26,9 @@ inputs:
     required: false
     default: ""
   group:
-    description: Run only these groups, one per line or comma-separated. Omit to run every active test.
+    description: >-
+      Run only these groups, one per line (a name may contain a comma), or comma-separated
+      on a single line. Omit to run every active test.
     required: false
     default: ""
   timeout:

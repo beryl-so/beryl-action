@@ -33,10 +33,16 @@ if [ -n "${INPUT_BUILD:-}" ]; then
 fi
 
 trigger=(runs trigger "${scope[@]}")
+# One per line keeps a name with a comma whole; a single line may list names with commas.
+groups="${INPUT_GROUP:-}"
+case "$groups" in
+  *$'\n'*) ;;
+  *) groups="$(printf '%s' "$groups" | tr ',' '\n')" ;;
+esac
 while IFS= read -r group; do
   group="$(printf '%s' "$group" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')"
   [ -n "$group" ] && trigger+=(--group "$group")
-done < <(printf '%s\n' "${INPUT_GROUP:-}" | tr ',' '\n')
+done < <(printf '%s\n' "$groups")
 
 created="$("$beryl" --json "${trigger[@]}")" || {
   rc=$?
